@@ -1,0 +1,11 @@
+{
+  "name": "Flare",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Flare": {
+        "$path": "src"
+      }
+    }
+  }
+}
