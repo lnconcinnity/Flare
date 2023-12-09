@@ -133,6 +133,16 @@ local function makeFlareClass(superClass: {})
         })
     end
 
+    function flareClass:_VERIFY_EXPOSED_PRIVATE()
+        print(C.getStackInfo(1), C.getStackInfo(2), C.getStackInfo(3), C.getStackInfo(4), C.getStackInfo(5))
+    end
+
+    function flareClass:_INTERNAL_CLEANUP()
+        table.clear(FlareClassObjects[self[OBJECT_REFERENCE_KEY]])
+        FlareClassObjects[self[OBJECT_REFERENCE_KEY]] = nil
+        setmetatable(self, nil)
+    end
+
     function flareClass:_BYPASS_ACCESS_IDENTIFIERS_FOR(method: (...any) -> (...any)): (...any) -> (...any)
         local objectStructure = FlareClassObjects[self[OBJECT_REFERENCE_KEY]]
         if objectStructure then
@@ -145,36 +155,47 @@ local function makeFlareClass(superClass: {})
         return self[`{propKey}.raw`].Changed:Connect(boundFn)
     end
     
-    -- TODO, redo flareClass:FriendClass() and flareClass:UnfriendClass() to flareClass:FriendReference() and flareClass:UnfriendReference()
-    function flareClass:FriendClass(classObject: any)
-        assert(getmetatable(classObject) and getmetatable(classObject)[OBJECT_REFERENCE_KEY] ~= nil, `Attempted to friend a static FlareClass interface`)
+    function flareClass:FriendReference(reference: any)
         local objectStructure = FlareClassObjects[self[OBJECT_REFERENCE_KEY]]
         if objectStructure then
-            local objId = classObject[OBJECT_REFERENCE_KEY]
-            for _, marker in pairs(classObject) do
-                if type(marker) == "function" then
-                    objectStructure[FRIEND_MARKER_KEY][marker] = objId
+            local refType = type(reference)
+            if refType == "table" then
+                assert(getmetatable(reference) and getmetatable(reference)[OBJECT_REFERENCE_KEY] ~= nil, `Attempted to friend a static FlareClass interface`)
+                local objId = reference[OBJECT_REFERENCE_KEY]
+                for _, marker in pairs(reference) do
+                    if type(marker) == "function" then
+                        objectStructure[FRIEND_MARKER_KEY][marker] = objId
+                    end
                 end
+            elseif refType == "function" then
+                objectStructure[FRIEND_MARKER_KEY][reference] = true
+            else
+                error("Invalid reference; must either be a function or another FlareClass")
             end
         end
     end
 
-    function flareClass:UnfriendClass(classObject: any)
-        assert(getmetatable(classObject) and getmetatable(classObject)[OBJECT_REFERENCE_KEY] ~= nil, `Attempted to unfriend a static FlareClass interface`)
+    function flareClass:UnfriendReference(reference: any)
         local objectStructure = FlareClassObjects[self[OBJECT_REFERENCE_KEY]]
         if objectStructure then
-            local objId = classObject[OBJECT_REFERENCE_KEY]
-            local friendsContainer = objectStructure[FRIEND_MARKER_KEY]
-            local keysForValues = {}
-            for marker, objectId in pairs(friendsContainer) do
-                if objectId == objId then
-                    keysForValues[#keysForValues+1] = marker
+            local refType = type(reference)
+            if refType == "table" then
+                assert(getmetatable(reference) and getmetatable(reference)[OBJECT_REFERENCE_KEY] ~= nil, `Attempted to unfriend a static FlareClass interface`)
+                local objId = reference[OBJECT_REFERENCE_KEY]
+                local friendsContainer = objectStructure[FRIEND_MARKER_KEY]
+                local keysForValues = {}
+                for marker, objectId in pairs(friendsContainer) do
+                    if objectId == objId then
+                        keysForValues[#keysForValues+1] = marker
+                    end
                 end
+                for n = #keysForValues, 1, -1 do
+                    friendsContainer[keysForValues[n]] = nil
+                end
+                keysForValues = nil
+            elseif refType == "function" then
+                objectStructure[FRIEND_MARKER_KEY][reference] = nil
             end
-            for n = #keysForValues, 1, -1 do
-                friendsContainer[keysForValues[n]] = nil
-            end
-            keysForValues = nil
         end
     end
 

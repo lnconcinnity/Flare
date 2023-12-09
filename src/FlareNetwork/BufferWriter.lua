@@ -1,3 +1,5 @@
+-- PacketParser.lua, BufferWriter.lua, Channel.lua and Remote.lua were originally of ffrostfall's ByteNet networking system; repurposed for my own uses
+
 local BYTE_SIZES = {
     Vector3 = 12,
     CFrame = 48, -- pos, qX, qY, qZ
