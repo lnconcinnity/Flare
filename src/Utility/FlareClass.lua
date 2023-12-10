@@ -133,8 +133,8 @@ local function makeFlareClass(superClass: {})
         })
     end
 
-    function flareClass:_VERIFY_EXPOSED_PRIVATE()
-        print(C.getStackInfo(1), C.getStackInfo(2), C.getStackInfo(3), C.getStackInfo(4), C.getStackInfo(5))
+    function flareClass:_IS_INTERNALLY_CALLED()
+        return FlareClassObjects[self[OBJECT_REFERENCE_KEY]][FN_REFERENCE_KEY][tostring(C.getStackInfo(2).closure)] ~= nil
     end
 
     function flareClass:_INTERNAL_CLEANUP()

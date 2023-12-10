@@ -21,7 +21,10 @@ local ProcessRecievedPacket: ({target: string, debugName: string, recipient: Pla
     local function passer(callback: (...any) -> (), recievedArgs: {any}, player: Player?)
         local acquiredRecievedPacketThread = freePacketRecievedThread
         freePacketRecievedThread = nil
-        callback(player, table.unpack(recievedArgs))
+        if IS_SERVER then
+            recievedArgs = {player, table.unpack(recievedArgs)}
+        end
+        callback(table.unpack(recievedArgs))
         freePacketRecievedThread = acquiredRecievedPacketThread
     end
 
@@ -36,7 +39,7 @@ local ProcessRecievedPacket: ({target: string, debugName: string, recipient: Pla
         if not foundRemote or #foundRemote._listeners <= 0 then
             MissingRemoteLogs[packetInfo.target] = (MissingRemoteLogs[packetInfo.target] or 0) + 1
             local cur = MissingRemoteLogs[packetInfo.target]
-            error(`Fired Remote [{packetInfo.debugName}] {cur} times with no bound connection. Have you bind the event with :Connect()?`)
+            error(`Fired Remote [{packetInfo.debugName:sub(1, #packetInfo.debugName-2) .. (if packetInfo.debugName:sub(#packetInfo.debugName-1) == ".R" then "(ReliableChannel)" else "(UnreliableChannel)")}] {cur} times with no bound connection. Have you bind the remote with :Connect()?`)
         end
         for _, boundFn: (...any) -> () in ipairs(foundRemote._listeners) do
             if not freePacketRecievedThread then
@@ -56,7 +59,7 @@ if IS_SERVER then
     }
 
     function RemoteAPI:FireClient(player: Player, ...)
-        local stream = OutgoingPacketsStream[player]
+        local stream = OutgoingPacketsStream.PlayerStreams[player]
         if stream then
             stream:add({target = self._id, debugName = `{self.Name..self._type}`, unreliable = self._unreliable, args = {...}})
         end
@@ -110,6 +113,9 @@ if IS_SERVER then
         end
         OutgoingPacketsStream.PlayerStreams[player] = nil
     end)
+    for _, existingPlayer in ipairs(Players:GetPlayers()) do
+        task.spawn(onPlayerAdded, existingPlayer)
+    end
     RunService.Heartbeat:Connect(function(_dt)
         local globalReliable, globalUnreliable = PacketParser.ProcessOut(OutgoingPacketsStream.GlobalOutgoingPackets:flush())
         for player, stream in pairs(OutgoingPacketsStream.PlayerStreams) do
