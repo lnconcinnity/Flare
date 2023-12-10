@@ -69,7 +69,7 @@ function Flare.LoadDescendants(group: Instance): {any}
     local loaded = {}
     local descendants = group:GetDescendants()
     for k = #descendants, 1, -1 do
-        if k:IsA("ModuleScript") then
+        if descendants[k]:IsA("ModuleScript") then
             local ok, object = xpcall(require, warn, descendants[k])
             if ok then
                 loaded[#loaded+1] = object
