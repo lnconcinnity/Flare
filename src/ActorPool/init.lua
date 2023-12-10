@@ -8,8 +8,14 @@ type ActorRef = {Actor: Actor, IsWorking: boolean, IsTemporary: boolean?, RefKey
 local IS_SERVER = RunService:IsServer()
 local MAX_ACTOR_COUNT = 128
 
-local bin = script:WaitForChild("ActorBin")
-bin.Parent = if IS_SERVER then game:GetService("ServerScriptService") else game:GetService("Players").LocalPlayer:WaitForChild("PlayerScripts")
+local bin = nil
+if IS_SERVER then
+    bin = script:WaitForChild("ActorBin"):Clone()
+    bin.Parent = game:GetService("ServerScriptService")
+else
+    bin = script:WaitForChild("ActorBin")
+    bin.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerScripts")
+end
 
 local templatesContainer = script:WaitForChild("SubscriberTemplates")
 local subscriberTemplate: Script | LocalScript = if IS_SERVER then templatesContainer:WaitForChild("ServerSubscriber") else templatesContainer:WaitForChild("ClientSubscriber")
