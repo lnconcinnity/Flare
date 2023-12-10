@@ -91,7 +91,7 @@ end
 local function makeFlareClass(superClass: {})
     local flareClass = {
     }
-    setmetatable(flareClass, superClass)
+    setmetatable(flareClass, {__index = superClass})
     function flareClass.new(...)
         local objectId = Hash.sha256(HttpService:GenerateGUID(false)) :: string
         local objectStructure = {}

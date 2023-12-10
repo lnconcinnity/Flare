@@ -15,7 +15,7 @@ local templatesContainer = script:WaitForChild("SubscriberTemplates")
 local subscriberTemplate: Script | LocalScript = if IS_SERVER then templatesContainer:WaitForChild("ServerSubscriber") else templatesContainer:WaitForChild("ClientSubscriber")
 
 local ActorPool = FlareClass.extend()
-function ActorPool:FlareInit(actorCount: number?, targetFactory: ModuleScript)
+function ActorPool:FlareInit(targetFactory: ModuleScript, actorCount: number?)
     assert(typeof(targetFactory) == "Instance" and targetFactory:IsA("ModuleScript"), "Argument 2 must be of a module script!")
     self.WarnAsyncUsage = true
     self._factoryId = HttpService:GenerateGUID(false)

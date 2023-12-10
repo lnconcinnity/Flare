@@ -113,4 +113,5 @@ function FlareNetwork:Destroy()
     setmetatable(self, nil)
 end
 
+FlareNetwork.post()
 return FlareNetwork
