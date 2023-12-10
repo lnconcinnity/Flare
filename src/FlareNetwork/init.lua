@@ -24,10 +24,12 @@ function FlareNetwork.has(networkName: string)
 end
 
 function FlareNetwork:FlareInit(networkName: string)
+    self._events = {}
+    self._functions = {}
     if IS_SERVER then
         self._marker = GetMarker(networkName, NetworksContainer)
     else
-        local marker = NetworksContainer:WaitForChild(networkName)
+        local marker = assert(NetworksContainer:FindFirstChild(networkName), `{networkName} does not exist`)
         local existingMarkers = marker:GetAttributes()
         for key, value in pairs(existingMarkers) do
             local isEvent = key:sub(#key) == 'E'
@@ -35,8 +37,6 @@ function FlareNetwork:FlareInit(networkName: string)
             self[if isEvent then "MakeEvent" else "MakeFunction"](self, key, value)
         end
     end
-    self._events = {}
-    self._functions = {}
 end
 
 function FlareNetwork:MakeEvent(eventName: string, unreliable: boolean?)

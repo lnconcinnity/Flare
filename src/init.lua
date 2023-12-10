@@ -103,7 +103,7 @@ function Flare.Start()
                             elseif marker == Flare.Identifiers.UnreliableEventMarker then
                                 net:MakeEvent(key, true)
                             elseif marker == Flare.Identifiers.FunctionMarker then
-                                net:Function(key)
+                                net:MakeFunction(key)
                             end
                         end
                         realObject.Client = net
