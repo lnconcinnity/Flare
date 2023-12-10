@@ -33,7 +33,7 @@ function FLARE_ACTOR_TEMPLATE:FlareInit()
     warn(script:GetActor() .. ":FlareInit() has not yet been overridden")
 end
 
-function FLARE_ACTOR_TEMPLATE:cleanup()
+function FLARE_ACTOR_TEMPLATE:Cleanup()
     warn(script:GetActor() .. ":cleanup() has not yet been overridden")
 end
 FLARE_ACTOR_TEMPLATE.post()
