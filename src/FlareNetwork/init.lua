@@ -19,6 +19,10 @@ end
 local NetworksContainer = if IS_SERVER then GetMarker("Networks") else script:WaitForChild("Networks")
 
 local FlareNetwork = FlareClass.extend()
+function FlareNetwork.has(networkName: string)
+    return NetworksContainer:FindFirstChild(networkName) ~= nil
+end
+
 function FlareNetwork:FlareInit(networkName: string)
     if IS_SERVER then
         self._marker = GetMarker(networkName, NetworksContainer)
@@ -94,8 +98,19 @@ end
 function FlareNetwork:Destroy()
     if IS_SERVER then
         self._marker:Destroy()
-        
+    else
+        self._marker = nil
     end
+    for k, e in pairs(self._events) do
+        e:Destroy()
+        self[k] = nil
+    end
+    for k, f in pairs(self._functions) do
+        f:Destroy()
+        self[k] = nil
+    end
+    self:_INTERNAL_CLEANUP()
+    setmetatable(self, nil)
 end
 
 return FlareNetwork
