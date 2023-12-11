@@ -51,7 +51,7 @@ end
 
 -- manage indexing, such as when indexing MyClass._player, MyClass.HEALTH, MyClass.damage, etc
 function FlareClassAPI:__index(key: any): any
-    local key_, mustGetRaw = string.gsub(key, ".raw^", "")
+    local key_, mustGetRaw = string.gsub(key, ".raw$", "")
     mustGetRaw = if type(mustGetRaw) == "number" then mustGetRaw > 0 else false
     local objectId = rawget(self, OBJECT_REFERENCE_KEY)
     local objectStructure = FlareClassObjects[objectId]
