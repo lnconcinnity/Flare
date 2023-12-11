@@ -88,9 +88,9 @@ function FlareClassAPI:__newindex(key: any, value: any)
     end
 end
 
-local function pasteTo(src: {}, dst: {})
+local function pasteTo(src: {}, dst: {}, fromSuper: boolean)
     for propKey, propValue in pairs(src) do
-        if EXEMPTED_STATIC_FIELDS[propKey] then continue end
+        if EXEMPTED_STATIC_FIELDS[propKey] or (fromSuper == true and dst[propKey] ~= nil) then continue end
         dst[propKey] = propValue
     end
 end
@@ -115,7 +115,7 @@ local function makeFlareClass(superClass: {})
         setmetatable(self, FlareClassAPI)
         pasteTo(flareClass, self)
         if type(superClass) == "table" then
-            pasteTo(superClass, self)
+            pasteTo(superClass, self, true)
         end
 
         if flareClass.FlareInit then
