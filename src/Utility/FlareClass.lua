@@ -113,10 +113,10 @@ local function makeFlareClass(superClass: {})
             [OBJECT_REFERENCE_KEY] = objectId,
         }, flareClass)
         setmetatable(self, FlareClassAPI)
+        pasteTo(flareClass, self)
         if type(superClass) == "table" then
             pasteTo(superClass, self)
         end
-        pasteTo(flareClass, self)
 
         if flareClass.FlareInit then
             flareClass.FlareInit(self, ...)
