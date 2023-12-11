@@ -88,10 +88,17 @@ function FlareClassAPI:__newindex(key: any, value: any)
     end
 end
 
+local function pasteTo(src: {}, dst: {})
+    for propKey, propValue in pairs(src) do
+        if EXEMPTED_STATIC_FIELDS[propKey] then continue end
+        dst[propKey] = propValue
+    end
+end
+
 local function makeFlareClass(superClass: {})
-    local flareClass = {
-    }
-    setmetatable(flareClass, {__index = superClass})
+    local flareClass = {}
+    flareClass.__index = flareClass
+    setmetatable(flareClass, superClass)
     function flareClass.new(...)
         local objectId = Hash.sha256(HttpService:GenerateGUID(false)) :: string
         local objectStructure = {}
@@ -106,31 +113,19 @@ local function makeFlareClass(superClass: {})
             [OBJECT_REFERENCE_KEY] = objectId,
         }, flareClass)
         setmetatable(self, FlareClassAPI)
-        for propKey, propValue in pairs(flareClass) do
-            if EXEMPTED_STATIC_FIELDS[propKey] then continue end
-            self[propKey] = propValue
+        if type(superClass) == "table" then
+            pasteTo(superClass, self)
         end
+        pasteTo(flareClass, self)
 
         if flareClass.FlareInit then
             flareClass.FlareInit(self, ...)
         end
-
         return self
     end
 
     function flareClass.extend()
         return makeFlareClass(flareClass)
-    end
-
-    function flareClass.post()
-        setmetatable(flareClass, {
-            __index = function(_, key: any)
-                error(`Unable index missing member "{key} of a static class"`)
-            end,
-            __newindex = function(_, key: any, value: any)
-                error(`Cannot assign new member "{key}" with the value "{value}" on a static clas`)
-            end
-        })
     end
 
     function flareClass:_IS_INTERNALLY_CALLED()
