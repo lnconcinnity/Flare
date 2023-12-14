@@ -159,11 +159,11 @@ local function makeFlareClass(superClass: {})
                 local objId = reference[OBJECT_REFERENCE_KEY]
                 for _, marker in pairs(reference) do
                     if type(marker) == "function" then
-                        objectStructure[FRIEND_MARKER_KEY][marker] = objId
+                        objectStructure[FRIEND_MARKER_KEY][tostring(marker)] = objId
                     end
                 end
             elseif refType == "function" then
-                objectStructure[FRIEND_MARKER_KEY][reference] = true
+                objectStructure[FRIEND_MARKER_KEY][tostring(reference)] = true
             else
                 error("Invalid reference; must either be a function or another FlareClass")
             end
@@ -189,7 +189,7 @@ local function makeFlareClass(superClass: {})
                 end
                 keysForValues = nil
             elseif refType == "function" then
-                objectStructure[FRIEND_MARKER_KEY][reference] = nil
+                objectStructure[FRIEND_MARKER_KEY][tostring(reference)] = nil
             end
         end
     end
