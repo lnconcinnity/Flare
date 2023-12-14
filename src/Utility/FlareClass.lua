@@ -105,7 +105,7 @@ local function makeFlareClass(superClass: {})
         objectStructure[PUBLIC_KEY] = {}
         objectStructure[PRIVATE_KEY] = {}
         objectStructure[PROTECTED_KEY] = {}
-        objectStructure[FRIEND_MARKER_KEY] = {}
+        objectStructure[FRIEND_MARKER_KEY] = setmetatable({}, {__mode = 'k'})
         objectStructure[FN_REFERENCE_KEY] = setmetatable({[tostring(flareClass.new)] = true}, {__mode = 'k'})
         FlareClassObjects[objectId] = objectStructure
         
@@ -126,6 +126,10 @@ local function makeFlareClass(superClass: {})
 
     function flareClass.extend()
         return makeFlareClass(flareClass)
+    end
+
+    function flareClass:_IGNORE_METAMETHODS_FOR(fn: () -> ())
+        assert(type(fn) == "function", "Argument 1 expects a function")
     end
 
     function flareClass:_IS_INTERNALLY_CALLED()
