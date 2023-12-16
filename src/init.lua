@@ -21,12 +21,12 @@ Flare.Utility = script.Utility
 if IS_SERVER then
     function Flare.GetService(serviceName: string): any
         assert(HasFlareStarted, "Flare.GetService() can only be used after Flare has started (via Flare.Start()).")
-        return assert(FlareObjectsContainer[serviceName], `Service {serviceName} does not exist`)
+        return assert(FlareObjectsContainer[serviceName], `Service "{serviceName}" does not exist`)
     end
     
     function Flare.CreateService(serviceName: string, networkingContext: {any}): any
         assert(#serviceName > 0, "Argument 1 must be a non-empty string")
-        assert(not FlareObjectsContainer[serviceName], `{serviceName} already exists`)
+        assert(not FlareObjectsContainer[serviceName], `"{serviceName}" already exists`)
         local flareService = Instances.GetFlareObject()
         flareService.Name = serviceName
         if networkingContext then
@@ -52,12 +52,12 @@ else
 
     function Flare.GetController(controllerName: string): any
         assert(HasFlareStarted, "Flare.GetController() can only be used after Flare has started (via Flare.Start()).")
-        return assert(FlareObjectsContainer[controllerName], `Service {controllerName} does not exist`)
+        return assert(FlareObjectsContainer[controllerName], `Controller "{controllerName}" does not exist`)
     end
 
     function Flare.CreateController(controllerName: string)
         assert(#controllerName > 0, "Argument 1 must be a non-empty string")
-        assert(not FlareObjectsContainer[controllerName], `{controllerName} already exists`)
+        assert(not FlareObjectsContainer[controllerName], `"{controllerName}" already exists`)
         local flareController = Instances.GetFlareObject()
         flareController.Name = controllerName
         FlareObjectsContainer[controllerName] = flareController

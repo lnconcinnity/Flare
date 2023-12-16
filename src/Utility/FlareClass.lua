@@ -55,9 +55,10 @@ function FlareClassAPI:__index(key: any): any
     mustGetRaw = if type(mustGetRaw) == "number" then mustGetRaw > 0 else false
     local objectId = rawget(self, OBJECT_REFERENCE_KEY)
     local objectStructure = FlareClassObjects[objectId]
-    local accessingPrivate = if select(2, string.find(key_:sub(1, 2), '_', 1)) == 1 then FlareClassHelper.seekFunctionInTruthOrigin(objectId) else false
+    local identifierCount = select(2, string.find(key_:sub(1, 2), '_', 1))
+    local isIndexingLowLevelMembers = if identifierCount ~= nil and identifierCount == 1 then FlareClassHelper.seekFunctionInTruthOrigin(objectId) else true
     local value = objectStructure[PUBLIC_KEY][key_] or objectStructure[PROTECTED_KEY][key_] or objectStructure[PRIVATE_KEY][key_]
-    if not accessingPrivate and value ~= nil then
+    if not isIndexingLowLevelMembers and value ~= nil then
         error(`Class access violation; attempted to index private "{key_}".`)
     end
     return if type(value) == "table" and type(value.get) == "function" then (if mustGetRaw then value else value:get()) else nil
@@ -67,11 +68,12 @@ function FlareClassAPI:__newindex(key: any, value: any)
     local objectId = rawget(self, OBJECT_REFERENCE_KEY)
     local objectStructure = FlareClassObjects[objectId]
     local identifierCount = select(2, string.find(key:sub(1, 2), '_', 1))
-    local accessOk = if identifierCount > 0 then FlareClassHelper.seekFunctionInTruthOrigin(objectId) else false
+    local isIndexingInternals = identifierCount ~= nil and identifierCount > 0
+    local hasHighLevelAccess = if isIndexingInternals then FlareClassHelper.seekFunctionInTruthOrigin(objectId) else false
     local targetContainer = objectStructure[PUBLIC_KEY]
-    if accessOk then
+    if hasHighLevelAccess then
         targetContainer = if identifierCount ~= nil and identifierCount == 1 then objectStructure[PRIVATE_KEY] elseif identifierCount ~= nil and identifierCount == 2 then objectStructure[PROTECTED_KEY] else objectStructure[PUBLIC_KEY]
-    elseif identifierCount ~= nil and identifierCount > 0 then
+    elseif isIndexingInternals then
         error(`Class access violation; attempted to assign "{key}" from an outside source.`)
     end
     if targetContainer[key] ~= nil then
