@@ -55,9 +55,9 @@ function FlareClassAPI:__index(key: any): any
     mustGetRaw = if type(mustGetRaw) == "number" then mustGetRaw > 0 else false
     local objectId = rawget(self, OBJECT_REFERENCE_KEY)
     local objectStructure = FlareClassObjects[objectId]
-    local accessOk = FlareClassHelper.seekFunctionInTruthOrigin(objectId)
+    local accessingPrivate = if select(2, string.find(key_:sub(1, 2), '_', 1)) == 1 then FlareClassHelper.seekFunctionInTruthOrigin(objectId) else false
     local value = objectStructure[PUBLIC_KEY][key_] or objectStructure[PROTECTED_KEY][key_] or objectStructure[PRIVATE_KEY][key_]
-    if not accessOk and select(2, string.find(key_:sub(1, 2), '_', 1)) == 1 and value ~= nil then
+    if not accessingPrivate and value ~= nil then
         error(`Class access violation; attempted to index private "{key_}".`)
     end
     return if type(value) == "table" and type(value.get) == "function" then (if mustGetRaw then value else value:get()) else nil
@@ -66,9 +66,9 @@ end
 function FlareClassAPI:__newindex(key: any, value: any)
     local objectId = rawget(self, OBJECT_REFERENCE_KEY)
     local objectStructure = FlareClassObjects[objectId]
-    local accessOk = FlareClassHelper.seekFunctionInTruthOrigin(objectId)
+    local identifierCount = select(2, string.find(key:sub(1, 2), '_', 1))
+    local accessOk = if identifierCount > 0 then FlareClassHelper.seekFunctionInTruthOrigin(objectId) else false
     local targetContainer = objectStructure[PUBLIC_KEY]
-    local _, identifierCount = string.find(key:sub(1, 2), '_', 1)
     if accessOk then
         targetContainer = if identifierCount ~= nil and identifierCount == 1 then objectStructure[PRIVATE_KEY] elseif identifierCount ~= nil and identifierCount == 2 then objectStructure[PROTECTED_KEY] else objectStructure[PUBLIC_KEY]
     elseif identifierCount ~= nil and identifierCount > 0 then
