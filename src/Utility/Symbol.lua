@@ -1,6 +1,8 @@
 local SYMBOL_KEY_PRESET = "Symbol<%s>"
 
-local function makeSymbol(symbolName: string)
+type Symbol = typeof(newproxy(true))
+
+local function makeSymbol(symbolName: string): Symbol
     local symbolKey = SYMBOL_KEY_PRESET:format(symbolName)
     local proxy = newproxy(true)
     getmetatable(proxy).__tostring = function()

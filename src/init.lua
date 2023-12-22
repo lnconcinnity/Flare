@@ -6,6 +6,8 @@ local Symbol = require(script.Utility.Symbol)
 local FlareNetwork = require(script.FlareNetwork)
 local Instances = require(script.Instances)
 
+type FlareObject = typeof(Instances.GetFlareObject())
+
 local IS_SERVER = RunService:IsServer()
 
 local HasFlareStarted, FlareStartedEvent = false, Siganl.new()
@@ -24,7 +26,7 @@ if IS_SERVER then
         return assert(FlareObjectsContainer[serviceName], `Service "{serviceName}" does not exist`)
     end
     
-    function Flare.CreateService(serviceName: string, networkingContext: {any}): any
+    function Flare.CreateService(serviceName: string, networkingContext: {any}): FlareObject
         assert(#serviceName > 0, "Argument 1 must be a non-empty string")
         assert(not FlareObjectsContainer[serviceName], `"{serviceName}" already exists`)
         local flareService = Instances.GetFlareObject()
@@ -55,7 +57,7 @@ else
         return assert(FlareObjectsContainer[controllerName], `Controller "{controllerName}" does not exist`)
     end
 
-    function Flare.CreateController(controllerName: string)
+    function Flare.CreateController(controllerName: string): FlareObject
         assert(#controllerName > 0, "Argument 1 must be a non-empty string")
         assert(not FlareObjectsContainer[controllerName], `"{controllerName}" already exists`)
         local flareController = Instances.GetFlareObject()

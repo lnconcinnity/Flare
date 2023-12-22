@@ -15,7 +15,7 @@ local function _onDebugInfoRequestErrored(msg: string)
     warn(`[DEBUG.INFO FAULT] {msg}`)
 end
 
-local function safeGetDebugInfo(closureOrLevel: number | Closure, options: string)
+local function safeGetDebugInfo(closureOrLevel: number | Closure, options: string): (number, boolean, string, number, string, ((...any) -> (...any))?)
     if type(closureOrLevel) == "number" then
         closureOrLevel = closureOrLevel + 4
         -- xpcall

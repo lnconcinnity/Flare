@@ -50,7 +50,7 @@ end
 --
 
 -- manage indexing, such as when indexing MyClass._player, MyClass.HEALTH, MyClass.damage, etc
-function FlareClassAPI:__index(key: any): any
+function FlareClassAPI:__index<T>(key: T): T
     local key_, mustGetRaw = string.gsub(key, ".raw$", "")
     mustGetRaw = if type(mustGetRaw) == "number" then mustGetRaw > 0 else false
     local objectId = rawget(self, OBJECT_REFERENCE_KEY)
@@ -97,11 +97,11 @@ local function pasteTo(src: {}, dst: {}, fromSuper: boolean)
     end
 end
 
-local function makeFlareClass(superClass: {})
-    local flareClass = {}
+local function makeFlareClass<T...>(superClass: {T}): T...
+    local flareClass: {T} = {}
     flareClass.__index = flareClass
     setmetatable(flareClass, superClass)
-    function flareClass.new(...)
+    function flareClass.new<T...>(...: T...)
         local objectId = Hash.sha256(HttpService:GenerateGUID(false)) :: string
         local objectStructure = {}
         objectStructure[PUBLIC_KEY] = {}
@@ -130,11 +130,7 @@ local function makeFlareClass(superClass: {})
         return makeFlareClass(flareClass)
     end
 
-    function flareClass:_IGNORE_METAMETHODS_FOR(fn: () -> ())
-        assert(type(fn) == "function", "Argument 1 expects a function")
-    end
-
-    function flareClass:_IS_INTERNALLY_CALLED()
+    function flareClass:_IS_INTERNALLY_CALLED(): boolean
         return FlareClassObjects[self[OBJECT_REFERENCE_KEY]][FN_REFERENCE_KEY][tostring(C.getStackInfo(2).closure)] ~= nil
     end
 
@@ -152,11 +148,11 @@ local function makeFlareClass(superClass: {})
         return method
     end
 
-    function flareClass:GetPropertyChangedSignal(propKey: any, boundFn: (...any) -> ())
+    function flareClass:GetPropertyChangedSignal(propKey: any, boundFn: (...any) -> ()): Value.Connection
         return self[`{propKey}.raw`].Changed:Connect(boundFn)
     end
     
-    function flareClass:FriendReference(reference: any)
+    function flareClass:FriendReference(reference: (...any) -> (...any) | typeof(setmetatable({}, {})))
         local objectStructure = FlareClassObjects[self[OBJECT_REFERENCE_KEY]]
         if objectStructure then
             local refType = type(reference)
@@ -176,7 +172,7 @@ local function makeFlareClass(superClass: {})
         end
     end
 
-    function flareClass:UnfriendReference(reference: any)
+    function flareClass:UnfriendReference(reference: (...any) -> (...any) | typeof(setmetatable({}, {})))
         local objectStructure = FlareClassObjects[self[OBJECT_REFERENCE_KEY]]
         if objectStructure then
             local refType = type(reference)

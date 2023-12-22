@@ -1,14 +1,21 @@
 local Signal = require(script.Parent.Signal)
 
-type Value = {
-    Value: any,
-    Changed: typeof(Signal.new())
+export type Connection = Signal.Connection
+type Value<T> = {
+    Value: T,
+    Changed: typeof(Signal.new()),
+    get: () -> (T),
+    set: (newValue: T, forceValue: boolean) -> ()
 }
 
 local ValueAPI = {}
+function ValueAPI:__tostring()
+    return tostring(self.Value)
+end
+
 function ValueAPI:set<T>(newValue: T, forceValue: boolean)
     if (self.Value ~= newValue or forceValue == true) and self._valueLocked == false then
-        self.Changed:FireDeferred(self.Value)
+        self.Changed:Fire(newValue)
         self.Value = newValue
     end
 end
@@ -27,7 +34,7 @@ end
 
 local Value = {}
 Value.__index = ValueAPI
-function Value.new<T>(initialValue: T): Value
+function Value.new<T>(initialValue: T): Value<T>
     local self = {}
     self._valueLocked = false
     self.Value = initialValue

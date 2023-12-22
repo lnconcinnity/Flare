@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local Hash = require(script.Parent.Parent.Utility.Hash)
-local Channel = require(script.Parent.Channel)
+local Channel = require(script.Parent.Parent.Utility.Channel)
 local PacketParser = require(script.Parent.PacketParser)
 
 local IS_SERVER = RunService:IsServer()
