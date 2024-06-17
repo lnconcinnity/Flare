@@ -1,3 +1,5 @@
+--!native
+
 -- -----------------------------------------------------------------------------
 --               Batched Yield-Safe Signal Implementation                     --
 -- This is a Signal class which has effectively identical behavior to a       --

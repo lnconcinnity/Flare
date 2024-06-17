@@ -1,14 +1,19 @@
+--!native
 
 local C_FUNCTION_IDENTIFIER = "[C]"
+local DEBUG_OPTIONS = 'anlsf'
+local CLOSURE_NAMES = {'<cclosure>', '<anonymous>'}
+local NONE = 'n/a'
 
 type Closure = (...any) -> (...any) | thread
-type StackInfo = {
-    closure_name: string,
+export type StackInfo = {
     arg_count: number,
     is_variadic: boolean,
     line: number,
     source: string,
     closure: Closure | nil,
+    closure_name: string,
+    closure_address: string,
 }
 
 local function _onDebugInfoRequestErrored(msg: string)
@@ -36,16 +41,16 @@ function C.isC(closureOrLevel: number | Closure): boolean
 end
 
 function C.getStackInfo(stackLevel: number): StackInfo
-    local nargs, variadic, name, line, src, closure = safeGetDebugInfo(stackLevel, "anlsf")
+    local nargs, variadic, name, line, src, closure = safeGetDebugInfo(stackLevel, DEBUG_OPTIONS)
     return {
-        closure_name = if name ~= nil and #name > 0 then name else (if src == nil then "<cclosure>" else "<anonymous>"),
         arg_count = nargs or -1,
         is_variadic = if variadic ~= nil then variadic else false,
         line = line or -1,
         source = src or "<c>",
         closure = closure,
-
-    } :: StackInfo
+        closure_name = if name ~= nil and #name > 0 then name else (if src == nil then CLOSURE_NAMES[1] else CLOSURE_NAMES[2]),
+        closure_address = if closure  ~= nil then tostring(closure) else NONE,
+    }
 end
 
 return C

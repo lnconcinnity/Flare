@@ -1,0 +1,42 @@
+export type BufferWriter = {
+    writei8: (self: BufferWriter, input: number) -> (),
+    writei16: (self: BufferWriter, input: number) -> (),
+    writei32: (self: BufferWriter, input: number) -> (),
+    writeu8: (self: BufferWriter, input: number) -> (),
+    writeu16: (self: BufferWriter, input: number) -> (),
+    writeu32: (self: BufferWriter, input: number) -> (),
+    writef32: (self: BufferWriter, input: number) -> (),
+    writef64: (self: BufferWriter, input: number) -> (),
+    writebool: (self: BufferWriter, bool: boolean) -> (),
+    writestring: (self: BufferWriter, str: string, length: number?) -> (),
+    writerawstring: (self: BufferWriter, str: string, length: number?) -> (string),
+    writetype: (self: BufferWriter, datatype: any, input: any) -> (any),
+    writeinstance: (self: BufferReader, instance: Instance) -> (),
+    writeenum: (self: BufferReader, enum: EnumItem) -> (),
+    writemap: (self: BufferWriter, map: {[any]: any}) -> (),
+    writearray: (self: BufferWriter, array: {any}) -> (),
+    getbuffer: (self: BufferWriter) -> (any),
+    Cursor: number,
+}
+
+export type BufferReader = {
+    readi8: (self: BufferReader) -> (number),
+    readi16: (self: BufferReader) -> (number),
+    readi32: (self: BufferReader) -> (number),
+    readu8: (self: BufferReader) -> (number),
+    readu16: (self: BufferReader) -> (number),
+    readu32: (self: BufferReader) -> (number),
+    readf32: (self: BufferReader) -> (number),
+    readf64: (self: BufferReader) -> (number),
+    readbool: (self: BufferReader) -> (boolean),
+    readstring: (self: BufferReader) -> (string),
+    readrawstring: (self: BufferReader, length: number) -> (string),
+    readtype: (self: BufferReader, type: string) -> (any),
+    readmap: (self: BufferReader) -> ({[any]: any}),
+    readarray: (self: BufferReader) -> ({any}),
+    readinstance: (self: BufferReader) -> (Instance?),
+    readenum: (self: BufferReader) -> (EnumItem),
+    Cursor: number,
+}
+
+return {}
